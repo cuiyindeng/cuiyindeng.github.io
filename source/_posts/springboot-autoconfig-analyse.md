@@ -15,6 +15,9 @@ spring boot提供的自动配置，可以简化项目的配置，封装成starte
 ##### 原理分析：
 
 ```java
+/**
+*应用的启动类
+*/
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan //默认扫描所在包下面的class。
