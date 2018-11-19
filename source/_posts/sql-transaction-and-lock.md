@@ -41,6 +41,25 @@ tags:
 4. serializable
 	- A事务开启，做了查询。
 	- B事务开启，新增了一条数据，此时会插入失败；**解决了幻读问题**
+
 ### 锁
 
-####多版本并发控制（MVCC）
+使用锁是为了支持对共享数据的并发访问，保证数据的一致性和完整性。
+
+#### 锁的分类
+
+1. 表锁
+2. 行级锁。又可分为：
+	- 共享锁（Shared lock），也成读锁
+	- 排它锁（Exclusive lock），也称写锁
+
+#### 锁的应用
+
+1. read uncommitted；读不会加任何锁。而写会加排他锁，并到事务结束之后释放。
+2. read committed；行锁
+3. repeatable read；行锁和GAP锁结合形成的的Next-Key锁
+4. serializable；读加共享锁，写加排他锁
+
+#### 多版本并发控制（MVCC）
+
+只在read committed和repeatable read隔离级别下工作。
