@@ -50,15 +50,18 @@ tags:
 
 1. 表锁
 2. 行级锁。又可分为：
-	- 共享锁（Shared lock），也成读锁
-	- 排它锁（Exclusive lock），也称写锁
+	- 共享锁（Shared lock），也成读锁。S锁与S锁之间兼容；S锁与X锁之间互斥。
+	- 排它锁（Exclusive lock），也称写锁。X锁与X锁/S锁之间都互斥。
 
 #### 锁的应用
 
-1. read uncommitted；读不会加任何锁。而写会加排他锁，并到事务结束之后释放。
-2. read committed；行锁
-3. repeatable read；行锁和GAP锁结合形成的的Next-Key锁
-4. serializable；读加共享锁，写加排他锁
+1. read uncommitted；“读”不会加任何锁；“写”会加X锁，并到事务结束之后释放。
+	- 上例中的A事务还能读取B事务中加了X锁的数据，是因为A事务没有加任何锁，不会被X锁排斥。
+2. read committed；“读”不会加任何锁，使用MVCC机制读取了源数据的镜像版本；“写”会加X锁。
+	- 
+3. repeatable read；“读”不会加任何锁，使用MVCC机制读取了源数据的镜像版本；“写”会加X锁。
+	- 
+4. serializable；读加S锁，写加X锁
 
 #### 多版本并发控制（MVCC）
 
