@@ -65,11 +65,41 @@ curl http://localhost:8983/solr/news-core/update -H "Content-Type: text/xml" --d
 ## 3，查询
 
 ### 查询语法解析器
+
+指定Query Parser的方式有两种
+1. 用defType参数指定；例如：
+
+`&q=title:美国&defType=dismax`
+
+2. 用Local Parameters语法指定；例如：
+
+`&q={!dismax df=content}日本`
+
+#### Local Parameters—本地参数
+本地参数可以为查询字符串添加前缀，目的是为Query Parser提供更多的元数据信息。
+基本语法是：
+`{!k=v [k=v]...}`
+
+1. Note 1：
+当只有value没有key时，本地参数会默认给一个key-“type”；这种用法是在指定某个Query Parser。
+
+2. Note 2：
+本地参数中有个特殊的key—“v”，它可以为查询参数指定值。
+
+3. Note 3：
+本地参数中可以用$符号引用别的参数的值。
+
+4. Note 4：
+下面语句的意思是：定义了一个Filter Query；Query中指定的Query Parser是Function Range Query Parser；
+该Query Parser是用来解析后面的if()函数的，并限制if函数的返回值的范围最大为1；
+if()函数的第一个参数是一个gt()函数—比较reply的值大于700的结果。
+`&fq={!frange l=1}if(gt(reply,700),1,0)`
+
 ![](solr-usage/query-parser-1.png)
 #### Standard Query Parser
 继承自Lucene的Query Parser。
 Lucene Query Parser的语法形式是：Field name:"Term+操作符"。不指定Field name时，会用Default Field。
-Solr Standard Query Parser适用的查询（Request Handler接收）参数：
+Solr Standard Query Parser适用的查询参数（Request Handler接收）：
 ![](solr-usage/query-parser-2.png)
 #### DisMax Query Parser
 是Lucene Query Parser语法的一个子集。
