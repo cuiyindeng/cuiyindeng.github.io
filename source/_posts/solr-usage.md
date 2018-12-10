@@ -96,20 +96,29 @@ curl http://localhost:8983/solr/news-core/update -H "Content-Type: text/xml" --d
 if()函数的第一个参数是一个gt()函数—比较reply的值大于700的结果。
 `&fq={!frange l=1}if(gt(reply,700),1,0)`
 
-![](solr-usage/query-parser-1.png)
+![] (solr-usage/query-parser-1.png)
 
 #### Standard Query Parser
 
 继承自Lucene的Query Parser。
-Lucene Query Parser的语法形式是：Field name:"Term+操作符"。不指定Field name时，会用Default Field。
+Lucene Query Parser的语法形式是：Field name:"Term+操作符"。
+
+> 细节：
+
+```
+不指定Field name时，会用Default Field。
+Term分两种:
+1，单个Term。例如hello、你、好、"hello"、"test"等单个单词。
+2，Phrase短语。它是两头被引号包裹的一组单词。例如："Hello World"、"你好"、"欢迎回来"。
+```
 Solr Standard Query Parser适用的查询参数（Request Handler接收）：
-![](solr-usage/query-parser-2.png)
+![] (solr-usage/query-parser-2.png)
 
 #### DisMax Query Parser
 
 是Lucene Query Parser语法的一个子集。
 适用的查询参数除了上面的通用参数、高亮参数、facet参数之外，还包括以下参数：
-![](solr-usage/query-parser-3.png)
+![] (solr-usage/query-parser-3.png)
 
 #### Extended DisMax Query Parser
 
@@ -128,11 +137,62 @@ Facet可以基于索引文档的某个维度或方面，对查询匹配的索引
 q=*:*&
 	facet=on&	//开启Facet查询
 	fq=reply:[600 TO 800]&	//查询并过滤reply域的值在600至800之间的文档
+	facet.limit=4&			//限制内个facet组只返回前4项（term）
 	facet.field=content&	//在指定的content域上执行Facet查询，在Facet查询中，会对该域的域值进行分组统计。
 	facet.field=reply&		//指定了reply域，意义同上。
-	facet.query=content:"日本"& //在指定的子查询；“content:日本”上执行Facet查询，在Facet查询中，会对子查询的结果进行分组统计。
+	facet.query=content:"日本"& //在指定的子查询：“content:日本”上执行Facet查询，在Facet查询中，会对子查询的结果进行分组统计。
 	facet.query=content:"美国"	//意义同上。
 ```
 
 ## 5，Highlighting—高亮查询
+
+```
+q=blue fireball in the rain&	//查询项
+	df=sighting_en&				//应用的default field。
+	wt=json&					//
+	hl=true&					//开启high lighting。
+	hl.snippets=2&				//每个查询到的索引文档，最多返回2个片段
+	hl.fl=sighting_en&			//为sighting_en field应用高亮。
+	hl.q=blue fireball in the rain light& //在高亮结果中增加一个q查询之外的 “light” term。
+	fq=shape_s:light			//filter query项。
+```
+
+## 7, Group—分组
+
+### Grouping Results by Field
+
+根据Field对查询结果分组。
+
+```
+q=*:*&							//查询所有项。
+	sort=popularity asc&		//根据popularity排序。
+	fl=id,type,product,format&	//查询结果中返回的field list。
+	group=true&					//对查询结果分组。
+	group.field=product&		//根据product field对查询结果进行分组。
+	group.main=true				//合并每个分组的结果，在response的“docs”下显示。
+```
+
+### Grouping by Query
+
+根据子查询对结果分组。
+示例：
+
+```
+q=*:*&							//查询所有项。
+	sort=popularity asc&		//根据popularity排序。
+	fl=id,type,product,format&	//查询结果中返回的field list。
+	group=true&					//对查询结果分组。
+	group.limit=2&				//每组返回2个结果。等于-1时表示每组中返回所有结果。
+	group.query="The Hunger Games"&	//返回每个子查询及结果，并对子查询的结果分组
+	group.query=games&				//同上。
+	group.query=type:Movies			//同上。
+```
+
+### Collapsing Query Parser
+
+它的作用是：每个field组下面的唯一term值，只返回一个索引文档
+语法：`q=*:*&fq={!collapse field=product}`
+group与它不同的是：
+group返回的是每个field组下面的所有匹配的索引文档，并且可以通过"group.limit"参数来控制返回1个、多个或者所有个。
+
 
