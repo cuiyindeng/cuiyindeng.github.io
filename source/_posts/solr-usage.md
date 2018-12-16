@@ -96,7 +96,11 @@ curl http://localhost:8983/solr/news-core/update -H "Content-Type: text/xml" --d
 if()函数的第一个参数是一个gt()函数—比较reply的值大于700的结果。
 `&fq={!frange l=1}if(gt(reply,700),1,0)`
 
-![] (solr-usage/query-parser-1.png)
+
+#### Common Query Parameters
+通用查询参数：
+
+![](solr-usage/common-parameter.png)
 
 #### Standard Query Parser
 
@@ -112,13 +116,13 @@ Term分两种:
 2，Phrase短语。它是两头被引号包裹的一组单词。例如："Hello World"、"你好"、"欢迎回来"。
 ```
 Solr Standard Query Parser适用的查询参数（Request Handler接收）：
-![] (solr-usage/query-parser-2.png)
+![](solr-usage/standard-query-parser.png)
 
 #### DisMax Query Parser
 
 是Lucene Query Parser语法的一个子集。
 适用的查询参数除了上面的通用参数、高亮参数、facet参数之外，还包括以下参数：
-![] (solr-usage/query-parser-3.png)
+![](solr-usage/dismax-query-parser.png)
 
 #### Extended DisMax Query Parser
 
@@ -157,7 +161,7 @@ q=blue fireball in the rain&	//查询项
 	fq=shape_s:light			//filter query项。
 ```
 
-## 7, Group—分组
+## 7，Group—分组查询
 
 ### Grouping Results by Field
 
@@ -195,4 +199,17 @@ q=*:*&							//查询所有项。
 group与它不同的是：
 group返回的是每个field组下面的所有匹配的索引文档，并且可以通过"group.limit"参数来控制返回1个、多个或者所有个。
 
+## 8，函数查询
 
+### 语法：
+
+`functionName(input1,[ ..., inputN])`
+
+
+### 使用形式：
+
+### 自定义函数：
+
+## 9，SolrCloud
+
+### 搭建
