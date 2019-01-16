@@ -24,7 +24,7 @@ Lock接口提供了synchronized所不具备的特性：
 
 AbstractQueuedSynchronizer是用来构建锁或其他同步组件的基础框架，它使用一个int成员变量表示同步状态；通过内置的FIFO队列来完成资源获取线程的排队工作。
 
-* 使用
+#### &emsp;&emsp;使用
 
 自定义同步组件（CustomLock）需要聚合一个AQS的子类（SpecificSynchronizer）。
 SpecificSynchronizer可重写的方法：
@@ -51,9 +51,9 @@ boolean release(int arg)|独占式释放同步状态，该方法会在释放同�
 boolean releaseShared(int arg)|共享式的释放同步状态。
 Collection<Thread> getQueuedThreads()|获取等待在同步队列上的线程集合。
 
-* 实现：
+#### &emsp;&emsp;实现：
 
-#### 独占式获取同步状态的关键点
+##### &emsp;&emsp;独占式获取同步状态的关键点
 
 1. AQS依赖内部的同步队列（一个FIFO的双向队列）来完成同步状态的管理。同步队列中节点（Node）用来保存获取同步状态失败的线程引用、等待状态以及前驱节点和后继节点。
 2. 通过调用AQS的acquire(int arg)方法可以获取同步状态。
