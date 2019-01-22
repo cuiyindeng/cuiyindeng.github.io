@@ -92,4 +92,93 @@ ReentrantLock支持对获取锁时公平性的设置。
 
 #### &emsp;&emsp;实现：
 * 读写锁的同步器需要在同步状态（变量-state）上维护多个读线程和一个写线程的状态。这样就需要“按位切割使用”这个变量：高16位表示读，低16位表示写。
-_待完成_
+* 源码解读
+
+```java
+/**
+ReentrantReadWriteLock中的部分源码，主要分析“写锁”。
+@see java.util.concurrent.locks.ReentrantReadWriteLock
+*/
+static final int SHARED_SHIFT   = 16;
+static final int SHARED_UNIT    = (1 << SHARED_SHIFT);
+static final int MAX_COUNT      = (1 << SHARED_SHIFT) - 1;
+
+/**
+下面的公式转成二进制的运算：
+= 0000 0000 0000 0001 0000 0000 0000 0000 - 1
+= 1*2^16 - 1
+= 1*2^15
+= 0000 0000 0000 0000 1111 1111 1111 1111
+意思是取低位的最大值。
+*/
+static final int EXCLUSIVE_MASK = (1 << SHARED_SHIFT) - 1;
+
+/** 
+Returns the number of shared holds represented in count  
+*/
+static int sharedCount(int c)    { return c >>> SHARED_SHIFT; }
+/** 
+Returns the number of exclusive holds represented in count 
+
+返回持有写锁的线程的数量
+如果c = 0；则：
+0000 0000 0000 0000 0000 0000 0000 0000 & 0000 0000 0000 0000 1111 1111 1111 1111 = 0000 0000 0000 0000 0000 0000 0000 0000
+如果c = 1；则：
+0000 0000 0000 0000 0000 0000 0000 0001 & 0000 0000 0000 0000 1111 1111 1111 1111 = 0000 0000 0000 0000 0000 0000 0000 0001
+可以得知，其意思是计算低位的值。
+ */
+static int exclusiveCount(int c) { return c & EXCLUSIVE_MASK; }
+
+/**
+该方法最终被ReentrantReadWriteLock.WriteLock调用。
+@see java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock#lock
+*/
+protected final boolean tryAcquire(int acquires) {
+	/*
+	 * Walkthrough:
+	 * 1. If read count nonzero or write count nonzero
+	 *    and owner is a different thread, fail.
+	 * 2. If count would saturate, fail. (This can only
+	 *    happen if count is already nonzero.)
+	 * 3. Otherwise, this thread is eligible for lock if
+	 *    it is either a reentrant acquire or
+	 *    queue policy allows it. If so, update state
+	 *    and set owner.
+	 */
+	Thread current = Thread.currentThread();
+	int c = getState();
+	//获取持有写锁的线程数量。
+	int w = exclusiveCount(c);
+	if (c != 0) {
+		// (Note: if c != 0 and w == 0 then shared count != 0)
+		/**
+		在取到写锁线程的数目后，首先判断是否已经有线程持有了锁，如果已经有线程持有了锁(c!=0)，
+		则看当前持有写锁的线程的数目，如果写线程数（w）为0（那么读线程数就不为0，因为上面的c和此处的w都是取的state，而读锁和写锁都依赖state。）
+		或者独占锁线程（持有锁的线程）不是当前线程就返回失败；
+		如果写入锁的数量（其实是重入数）大于65535就抛出一个Error异常。
+		*/
+		if (w == 0 || current != getExclusiveOwnerThread())
+			return false;
+		if (w + exclusiveCount(acquires) > MAX_COUNT)
+			throw new Error("Maximum lock count exceeded");
+		// Reentrant acquire
+		setState(c + acquires);
+		return true;
+	}
+	/**
+	writerShouldBlock如果返回true，则表示当前线程是在运行在公平锁下，并且有前驱节点，需要阻塞；
+					如果返回false，则表示当前线程没有前驱节点或者运行在非公平锁下，不需要阻塞。
+	@see java.util.concurrent.locks.ReentrantReadWriteLock.FairSync#writerShouldBlock
+	
+	compareAndSetState如果返回true，则表示成功获取到锁；
+	*/
+	if (writerShouldBlock() ||					
+		!compareAndSetState(c, c + acquires))
+		return false;
+	setExclusiveOwnerThread(current);
+	return true;
+}
+```
+
+> 源码解读参考：
+> https://blog.csdn.net/MeituanTech/article/details/84138163
