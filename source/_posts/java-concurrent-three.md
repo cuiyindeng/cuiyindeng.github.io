@@ -70,6 +70,9 @@ Collection<Thread> getQueuedThreads()|获取等待在同步队列上的线程集
 > 参考测试代码：
 > https://github.com/legend9207/concurrent_code/blob/master/src/com/roocon/thread/ta4/Main.java
 
+##### &emsp;&emsp;共享式获取同步状态的关键点
+
+_待完成_
 
 ### 3. 重入锁
 

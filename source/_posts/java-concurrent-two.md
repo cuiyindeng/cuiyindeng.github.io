@@ -39,7 +39,8 @@ JVM会先将该线程的`中断标识位`清除，然后抛出InterruptedExcepti
 #### &emsp;&emsp;等待通知范式
 
 * 等待方遵循的原则：
-1. “线程”获取对象的锁。
+
+1. “线程”获取对象的锁。wait的是“线程”对象。
 2. 如果条件不满足则调用对象的wait()方法，被通知后仍要检查条件。
 3. 条件满足则执行对应的逻辑。
 代码：
@@ -51,6 +52,7 @@ synchronized(对象) {
 	处理对应的逻辑
 }
 ```
+> 当“对象锁”是Thread对象时，此时wait的是获取“对象锁”的线程，而不是Thread对象。
 
 * 通知方遵循的原则：
 1. “线程”获取对象的锁。
@@ -63,6 +65,10 @@ synchronized(对象){
 	对象.notifyAll();
 }
 ```
+
+> 当`main线程`调用t.join时候，`main线程`会获得`线程对象t`的锁（wait意味着拿到该对象的锁)，调用该对象的wait(等待时间)，直到该对象唤醒`main线程`，比如退出后。
+> 这就意味着`main线程`调用t.join时，必须能够拿到线程t对象的锁。
+
 #### Thread.join的原理解释：
 ```
 //场景：
@@ -73,13 +79,12 @@ main() {
 
 ```
 //解释：
-// 加锁当前线程对象。
-//此时的“对象”锁是thread。相当于范式中的“synchronized(对象)”
+//此时的“对象锁”是thread对象；相当于范式中的“synchronized(对象)”。
 public final synchronized void join() throws InterruptedException {
 	// 条件不满足，继续等待
 	while (isAlive()) {
-		//thread调用自身的wait方法。
-		//相当于范式中“对象.wait()”。所以此时等待的是“main线程'对象'”。
+		//thread对象调用自身的wait方法。
+		//相当于范式中“对象.wait()”。所以此时等待的是“main线程对象”。
 		wait(0);
 	}
 	// 条件符合，方法返回
