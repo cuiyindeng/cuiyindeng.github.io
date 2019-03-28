@@ -113,6 +113,13 @@ private TransactionFactory getTransactionFactoryFromEnvironment(Environment envi
 	/**
 	根据transactionManager节点的type获取TransactionFactory。
 	@see org.apache.ibatis.session.Configuration#Configuration()。
+	
+	Mybatis有两种管理事务的方式：
+	1，JdbcTransaction；它使用JDBC的事务提交和回滚机制。直观地讲，就是JdbcTransaction使用的是java.sql.Connection上的commit和rollback功能，
+	JdbcTransaction只是相当于对java.sql.Connection事务处理进行了一次包装（wrapper）。
+	
+	2，ManagedTransaction，它是将事务的提交和回滚操作交给具体的容器去实现的；直接调用ManagedTransaction中的commit和rollback方法是无效的。
+	具体的实现有：mybatis-spring中的SpringManagedTransaction等。
 	**/
 	
     if (environment == null || environment.getTransactionFactory() == null) {
@@ -402,9 +409,9 @@ private class SqlSessionInterceptor implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 	  /**
-		静态导入的@see org.mybatis.spring.SqlSessionUtils.getSqlSession 方法。
+		静态导入的@see org.mybatis.spring.SqlSessionUtils.getSqlSession方法是spring管理mybatis事务的关键之处。
 		它的作用是:首先从当前事务的线程中获取SqlSession；如果有，直接返回SqlSession；
-		如果没有，则用SqlSessionFactory创建一个，并绑定到当前事务的线程中。
+		如果没有，则用SqlSessionFactory创建一个，并绑定到当前事务的线程中，即spring的事务管理器中。
 	  **/
       SqlSession sqlSession = getSqlSession(
           SqlSessionTemplate.this.sqlSessionFactory,
