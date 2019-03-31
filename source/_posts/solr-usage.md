@@ -82,10 +82,10 @@ curl http://localhost:8983/solr/news-core/update -H "Content-Type: text/xml" --d
 `{!k=v [k=v]...}`
 
 1. Note 1：
-当只有value没有key时，本地参数会默认给一个key-“type”；这种用法是在指定某个Query Parser。
+当只有value没有key时，本地参数会默认给一个key，即“type”；这种用法是在指定某个Query Parser。
 
 2. Note 2：
-本地参数中有个特殊的key—“v”，它可以为查询参数指定值。
+本地参数中有个特殊的key，即“v”，它可以为查询参数指定值。
 
 3. Note 3：
 本地参数中可以用$符号引用别的参数的值。
@@ -204,11 +204,33 @@ group返回的是每个field组下面的所有匹配的索引文档，并且可�
 ### 语法：
 
 `functionName(input1,[ ..., inputN])`
+input参数可以是以下任意一种形式：
+1. 一个常量值：100、1.45、"hello world"
+2. 一个域名称：fieldName、field(fieldName)
+3. 一个function：functionName(...)
+4. 一个变量：q={!func}min($f1,$f2)&f1=sqrt(popularity)&f2=1
 
+一些特殊的语法：
+1. Constant Function的语法是值本身。
+2. Field Function的语法是域的名称被一个名称为“field”的函数包裹。
+3. Parameter Substitution（替换变量）的语法是函数的输入变量是一个$开头的变量，该变量引用自请求URL中查询文本定义的变量。
 
 ### 使用形式：
+有多种：
+1. 对q参数加权；`q=solr AND _val_:"recip(ms(date),1,100,100)"`
+2. 在不同Query Parser中使用；在eDisMax Query Parser中通过bf参数指定function， `q=dismax&bf="ord(popularity)^0.5 recip(rord(price),1,1000,1000)^0.3"`
+3. 通过本地参数!func来构造一个Function Query；`q=solr AND {!func v ="add(l,boostField)"}`
+
+### Function Range Query Parser（简称frange）
+可以根据函数计算值的范围来过滤索引文档。
+```
+q=*:*&
+	fq={!frange l=10 u=15}product(basePrice,sum(1,$userSalseTax))&	//l表示lower最小值，u表示upper最大值。
+	userSalseTax=0.07
+```
 
 ### 自定义函数：
+![](solr-usage/custom-function.png)
 
 ## 9，SolrCloud
 

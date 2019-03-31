@@ -15,23 +15,23 @@ tags:
 
 #### 1，SqlSessionFactoryBuilder
 
-这个类可以被实例化、使用和丢弃，一旦创建了 SqlSessionFactory，就不再需要它了。
-因此 SqlSessionFactoryBuilder 实例的最佳作用域是method作用域。
+这个类可以被实例化、使用和丢弃，一旦创建了SqlSessionFactory，就不再需要它了。
+因此SqlSessionFactoryBuilder实例的最佳作用域是method作用域。
 
 #### 2，SqlSessionFactory
-SqlSessionFactory 一旦被创建就应该在 application 的运行期间一直存在，没有任何理由对它进行清除或重建。
-使用 SqlSessionFactory 的最佳实践是在 application 运行期间不要重复创建多次；SqlSessionFactory 的最佳作用域是 application 作用域
+SqlSessionFactory一旦被创建就应该在application的运行期间一直存在，没有任何理由对它进行清除或重建。
+使用SqlSessionFactory的最佳实践是在application运行期间不要重复创建多次：SqlSessionFactory的最佳作用域是application作用域
 
 #### 3，SqlSession
-每个线程都应该有它自己的 SqlSession 实例。SqlSession 的实例不是线程安全的，因此是不能被共享的，
-所以它的最佳的作用域是 request 或者 method 作用域。
+每个线程都应该有它自己的SqlSession实例。SqlSession的实例不是线程安全的，因此是不能被共享的，
+所以它的最佳的作用域是request或者method作用域。
 
 SqlSession相当于一个JDBC的Connection对象，也可以说它的生命周期是在请求数据库处理事务的过程中，
 它的长期存在对数据库连接池影响很大，应该及时close。
 它存活于一个应用的请求和操作，可以执行多条SQL，保证事务的一致性。
 
 #### 4，Mapper Instances
-映射器是用来绑定映射的语句的接口。映射器接口的实例是从 SqlSession 中获得的。
+映射器是映射的其实就是SQL语句；供SqlSession调用。映射器接口的实例是用SqlSession中从Mybatis的Configuration对象中获得的。
 因此，任何映射器实例的最大作用域是和请求它们的 SqlSession 相同的，并且映射器实例的最佳作用域是method作用域。
 也就是说，映射器实例应该在调用它们的方法中被请求，用过之后即可废弃，并不需要显式地关闭映射器实例。
 
@@ -276,6 +276,7 @@ public T newInstance(SqlSession sqlSession) {
 Mapper代理类的详细执行过程可以看以下代码：
 @see org.apache.ibatis.binding.MapperProxy
 @see org.apache.ibatis.binding.MapperMethod#execute()
+最终还是回到SqlSession.selectXxx的逻辑中。
 **/
 ```
 
@@ -314,27 +315,38 @@ mybatis-spring使用事务的前提配置：
   <property name="dataSource" ref="dataSource" />
 </bean>
 
-<!--配置SqlSessionTemplate，代替mybatis默认实现的DefaultSqlSession-->
+<!--
+<!--第一种方式：配置SqlSessionTemplate，代替mybatis默认实现的DefaultSqlSession-->
 <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
   <constructor-arg index="0" ref="sqlSessionFactory" />
 </bean>
 
-<!--在DAO中注入SqlSession-SqlSessionTemplate，这样DAO中就可以直接使用SqlSession了。-->
+<!--在DAO中注入SqlSessionTemplate，也就是SqlSession；这样DAO中就可以直接使用SqlSession了。-->
 <bean id="userDao" class="org.xxx.xxx.dao.UserDaoImpl">
   <property name="sqlSession" ref="sqlSession" />
 </bean>
+-->
 
-<!--如果不想以上面的DAO的方式显式调用SqlSession，可以使用Mapper接口的方式访问数据。-->
+<!--
+<!--第二种方式：如果不想用聚合SqlSessionTemplate或继承SqlSessionDaoSupport方式显式调用SqlSession，可以使用MapperFactoryBean生成Mapper接口的代理的方式调用数据访问api。-->
 <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
   <!--MapperFactoryBean会为UserMapper创建代理。-->
   <property name="mapperInterface" value="org.xxx.xxx.mapper.UserMapper" />
   <property name="sqlSessionFactory" ref="sqlSessionFactory" />
 </bean>
 
-<!--如果不想以上面XML的方式配置每个Mapper，可以使用MapperScannerConfigurer；它将会查找类路径下的Mapper并自动将它们创建成MapperFactoryBean-->
+<bean id="fooService" class="org.xxx.xxx.mapper.FooServiceImpl">
+  <property name="userMapper" ref="userMapper" />
+</bean>
+-->
+
+<!--
+<!--第三种方式：如果不想以上面XML的方式配置每个Mapper，可以使用MapperScannerConfigurer；它将会查找包路径下的Mapper并自动将它们创建成MapperFactoryBean-->
 <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
   <property name="basePackage" value="org.xxx.xx.mapper" />
 </bean>
+-->
+
 ```
 
 接下来看看以上各个类的部分源码：
@@ -381,7 +393,7 @@ protected SqlSessionFactory buildSqlSessionFactory() throws IOException {
 
 ```java
 /**
-SqlSessionTemplate在实例化Bean时会创建SqlSession的Proxy。
+SqlSessionTemplate在实例化Bean时会创建SqlSession的Proxy；调用Template的方法也即是在调用Proxy的方法。
 @see org.mybatis.spring.SqlSessionTemplate
 **/
 public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType,
@@ -436,17 +448,17 @@ private class SqlSessionInterceptor implements InvocationHandler {
 
 ```java
 /**
-该类通过继承SqlSessionDaoSupport，间接实现了InitializingBean。
+该类通过继承SqlSessionDaoSupport，间接实现了InitializingBean，它的afterPropertiesSet方法会调用checkDaoConfig。
 @see org.mybatis.spring.mapper.MapperFactoryBean#checkDaoConfig
 **/
 protected void checkDaoConfig() {
-    super.checkDaoConfig();
+	super.checkDaoConfig();
 	...
     Configuration configuration = getSqlSession().getConfiguration();
     if (this.addToConfig && !configuration.hasMapper(this.mapperInterface)) {
       try {
 		/**
-		注册Mapper接口，并创建Mapper对应的MapperProxyFactory对象。
+		注册Mapper接口，其中会解析Mapper接口对应的SQL语句，在调用SqlSession的方法时用。
 		**/
         configuration.addMapper(this.mapperInterface);
       } catch (Exception e) {
@@ -454,6 +466,15 @@ protected void checkDaoConfig() {
       }
     }
 }
+
+/**
+获取Mapper对象时，最终还是回到Mybatis的SqlSession#getMapper()逻辑中。
+**/
+@Override
+public T getObject() throws Exception {
+	return getSqlSession().getMapper(this.mapperInterface);
+}
+
 ```
 
 - MapperScannerConfigurer扫描并注册Mapper的过程：
@@ -497,7 +518,7 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
     for (BeanDefinitionHolder holder : beanDefinitions) {
       definition = (GenericBeanDefinition) holder.getBeanDefinition();
 	  ...
-	  //将Mapper转换成MapperFactoryBean
+	  //将Mapper转换成MapperFactoryBean，MapperFactoryBean会负责生成Mapper的代理。
       definition.setBeanClass(this.mapperFactoryBean.getClass());
 	  ...
 	  //将SqlSessionFactory、SqlSessionTemplate等设置到BeanDefinition，也即是MapperFactoryBean中。
@@ -511,6 +532,7 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
 ```
 
 ## mybatis-spring-boot-autoconfigure
-它的主要功能是自动装配`SqlSessionFactory`、`SqlSessionTemplate`以及用`AutoConfiguredMapperScannerRegistrar`代替`MapperScannerConfigurer`的功能。
-
-*记录一个疑问：在auto configure的方式下，MapperFactoryBean中的SqlSessionTemplate是怎么注入进去的？*
+它的主要功能是：
+1. 自动装配`SqlSessionFactory`
+2. 自动装配`SqlSessionTemplate`
+3. 用`AutoConfiguredMapperScannerRegistrar`代替`MapperScannerConfigurer`的功能。
