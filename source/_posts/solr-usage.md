@@ -235,7 +235,57 @@ q=*:*&
 ## 9，SolrCloud
 
 ### 搭建
-......
+
+#### zookeeper搭建
+参考：
+> https://blog.csdn.net/Thinking_one/article/details/89280227
+
+#### solr配置
+```shell
+#配置该环境变量会让solr以cloud的方式运行
+export ZK_HOST=192.168.0.201:2181,192.168.0.202:2181,192.168.0.203:2181
+
+#下载solr到指定目录
+wget -q 'http://apache.mirrors.hoobly.com/lucene/solr/6.5.1/solr-6.5.1.tgz' -P /root/
+
+#解压出来安装脚本
+tar xzf /root/solr-6.5.1.tgz, solr-6.5.1/bin/install_solr_service.sh '--strip-components=2'
+
+#安装solr，安装后会自动运行
+bash install_solr_service.sh /root/solr-6.5.1.tgz
+
+#停止solr
+service solr stop
+
+#改变solr运行目录所属用户
+chown -R "danny:danny" /opt/solr-6.5.1
+chown -R "danny:danny" /opt/solr
+
+#重启solr
+service solr start
+
+#切换到用户danny的环境下创建collection
+su -c "/opt/solr/bin/solr create_collection \	#运行solr命令
+							-c products \	#创建collection的名称
+							-d /opt/myapp/configuration/solr/products/conf/ \	#collection需要的配置文件的目录，主要是schema.xml和solrconfig.xml文件，该文件需要提前编写。
+							-shards 4 \	#指定当前collection的shard数量
+							-replicationFactor 1 \	#指定每个shard划分replica的数量
+							-n products-conf" \	#指定配置文件目录在zookeeper中的名称。
+												#默认-d参数下的所有配置文件会上传到zookeeper中，
+												#且以collection的名称（即-c的参数）作为配置文件目录在zookeeper中名称。
+							- danny	#切换到指定用户下执行
+
+#显示的将一个collection与指定的配置文件目录进行绑定
+sh /opt/solr/server/scripts/cloud-scripts/zkcli.sh \
+										-zkhost 192.168.0.19 \
+										-cmd linkconfig \
+										-collection products \
+										-confname products-conf
+
+#创建core
+curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=products&collection=products"
+										
+```
 
 ### SolrCloud的核心概念
 
@@ -252,15 +302,14 @@ q=*:*&
 ### 索引文档路由
 创建索引时的两种使用方式：
 1. 指定router.name参数来设置文档路由。
-2. 默认使用自动路由（compositeID），可以创建并发送一个document id带有前缀的索引文档；形式是：“前缀!真实的document id”，例如：“IBM!123”。
+2. 默认使用自动路由（compositeID），可以创建并发送一个document id带有前缀的索引文档；形式是：“前缀!真实的document id”，例如：“IBM!123”（也叫自定义散列）。
 搜索时：使用_route_参数指定前缀字符。
 
-它的作用是，查询时可以指定Shard，避免了在所有Shard之间查询的网络延迟，提高查询效率。
+> 它的作用是，通过计算前缀的hash值，来确定该索引文档发送到那个shard，这样前缀相同的文档就会发送到相同的shard，从而也可以实现group和join查询。
+> 查询时可以指定Shard，避免了在所有Shard之间查询的网络延迟，提高查询效率。
 
 ### 确定Shard Leader
 Shard Leader负责接收更新请求，并将这些请求协调分配给各个副本。
-
-### SolrCloud分布式查询
 
 ### SolrCloud分布式索引
 solrCloud中分布式索引的总体步骤是：能够将文档发送到集群中的各个节点，并且能够在正确的分片中被索引。
@@ -277,5 +326,30 @@ Solr会在每个分片之间均分这个32位的散列值。
 
 2. 隐式路由。
 
-#### 2，索引文档
-......
+#### 2，添加文档的步骤：
+1. 使用solrJ的CloudSolrServer发送更新请求。CloudSolrServer连接zookeeper以获取集群的当前状态；也知道哪些节点是分片代表；它也提供了基本的负载均衡和客户端重试逻辑。
+2. 将文档分配给正确的分片。CloudSolrServer需要使用文档路由进程来确定将文档发送到哪个分片上。
+3. 代表分配版本ID号。在将文档发送给副本之前，分片代表会本地索引文档；代表会给每一个新文档分配一个版本号。
+4. 将请求转发给副本。
+5. 确认写操作成功。
+
+#### 3，节点恢复
+SolrCloud能妥善的处理脱机节点，他提供了两种基本的恢复方案：
+1. 对等同步
+2. 快照复制
+这也表示可以在任何时间内将副本添加到集群中，因为它能自己从分片代表获取完整的索引。
+
+### SolrCloud分布式查询
+查询集合中的所有分片并创建统一结果集的过程称为分布式查询。
+
+#### 1，查询流程
+分布式查询过程中，solr需要将各个分片的结果汇总，然后将其合并为单个结果，最后响应给客户端。
+1. 客户端将查询请求发送到任何节点。
+2. 查询控制器接受请求。
+3. 查询。查询控制器会给每个分片发送一个非分布式查询；被发送给每个分片的查询式只请求id和score字段，不会过早读取所有存储字段，只有等到最后正确的文档被确认，才读取需要的文档中的存储字段。
+4. 读取字段。当上一步的查询确认了匹配的文档，查询控制器才会把第二步查询发送给节点的子集，以便得到满足请求的其他字段；如果请求需要的仅仅是ID字段，则不会发送第二步查询；另外，只有包含需要返回的文档的分片，才会接收第二步查询。
+
+#### 2，查询的局限性
+1. 按权重对文档排序时，会出现偏差。因为计算权重只用到了本地索引中的词频。
+2. 连接（join）在分布式环境下不起作用。除非使用`自定义散列`。
+3. 为了使用分组（group）功能，需要使用`自定义散列`去分配那些需要被分到同组的文档。
