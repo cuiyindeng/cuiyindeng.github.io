@@ -8,21 +8,21 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>【转】为什么Java中只有值传递 | 技术空间</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="为什么Java中只有值传递 原文： https://github.com/Snailclimb/JavaGuide/blob/master/docs/essential-content-for-interview/MostCommonJavaInterviewQuestions/第一周（2018-8-7）.md   首先回顾一下在程序设计语言中有关将参数传递给方法（或函数）的一些专业术语。按值调">
+  <meta name="description" content="为什么Java中只有值传递">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【转】为什么Java中只有值传递">
 <meta property="og:url" content="http://yoursite.com/2019/06/29/java-core-transfer/index.html">
 <meta property="og:site_name" content="技术空间">
-<meta property="og:description" content="为什么Java中只有值传递 原文： https://github.com/Snailclimb/JavaGuide/blob/master/docs/essential-content-for-interview/MostCommonJavaInterviewQuestions/第一周（2018-8-7）.md   首先回顾一下在程序设计语言中有关将参数传递给方法（或函数）的一些专业术语。按值调">
+<meta property="og:description" content="为什么Java中只有值传递">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-27/22191348.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-27/3825204.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-27/88729818.jpg">
 <meta property="og:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-27/34384414.jpg">
-<meta property="og:updated_time" content="2019-06-29T11:01:56.574Z">
+<meta property="og:updated_time" content="2019-06-29T13:21:09.558Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【转】为什么Java中只有值传递">
-<meta name="twitter:description" content="为什么Java中只有值传递 原文： https://github.com/Snailclimb/JavaGuide/blob/master/docs/essential-content-for-interview/MostCommonJavaInterviewQuestions/第一周（2018-8-7）.md   首先回顾一下在程序设计语言中有关将参数传递给方法（或函数）的一些专业术语。按值调">
+<meta name="twitter:description" content="为什么Java中只有值传递">
 <meta name="twitter:image" content="http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-27/22191348.jpg">
   
     <link rel="alternative" href="/atom.xml" title="技术空间" type="application/atom+xml">
@@ -161,8 +161,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <a id="more"></a>
-<h2 id="为什么Java中只有值传递"><a href="#为什么Java中只有值传递" class="headerlink" title="为什么Java中只有值传递"></a>为什么Java中只有值传递</h2><blockquote>
+        <h2 id="为什么Java中只有值传递"><a href="#为什么Java中只有值传递" class="headerlink" title="为什么Java中只有值传递"></a>为什么Java中只有值传递</h2><a id="more"></a>
+<blockquote>
 <p>原文： <a href="https://github.com/Snailclimb/JavaGuide/blob/master/docs/essential-content-for-interview/MostCommonJavaInterviewQuestions/第一周（2018-8-7）.md" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide/blob/master/docs/essential-content-for-interview/MostCommonJavaInterviewQuestions/第一周（2018-8-7）.md</a></p>
 </blockquote>
 <p> 首先回顾一下在程序设计语言中有关将参数传递给方法（或函数）的一些专业术语。<strong>按值调用(call by value)表示方法接收的是调用者提供的值，而按引用调用（call by reference)表示方法接收的是调用者提供的变量地址。一个方法可以修改传递引用所对应的变量值，而不能修改传递值调用所对应的变量值。</strong>  它用来描述各种程序设计语言（不只是Java)中方法参数传递方式。</p>
