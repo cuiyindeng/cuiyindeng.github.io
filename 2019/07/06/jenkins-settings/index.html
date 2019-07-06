@@ -16,12 +16,12 @@
 <meta property="og:description" content="本例中Jenkins服务器和gitlab的地址都是192.168.152.131；应用服务器地址是192.168.152.128. 主要可以分为一下几个步骤：">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins-1.png">
-<meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins2.png">
-<meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins3.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins-2.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins-3.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins-2-1.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins-3-1.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/06/jenkins-settings/jenkins-3-2.png">
-<meta property="og:updated_time" content="2019-07-06T17:50:39.416Z">
+<meta property="og:updated_time" content="2019-07-06T17:57:56.617Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用jenkins配置一个Freestyle project">
 <meta name="twitter:description" content="本例中Jenkins服务器和gitlab的地址都是192.168.152.131；应用服务器地址是192.168.152.128. 主要可以分为一下几个步骤：">
@@ -168,8 +168,8 @@
 <a id="more"></a>
 <h2 id="1，配置代码仓库"><a href="#1，配置代码仓库" class="headerlink" title="1，配置代码仓库"></a>1，配置代码仓库</h2><p>这一步用于拉取源代码</p>
 <p><img src="/2019/07/06/jenkins-settings/jenkins-1.png" alt=""></p>
-<p>下面是配置gitlab的访问权限，其中的private key是Jenkins服务器的。<br><img src="/2019/07/06/jenkins-settings/jenkins2.png" alt=""></p>
-<p>下面还要在gitlab中配置Jenkins服务器的public key。<br><img src="/2019/07/06/jenkins-settings/jenkins3.png" alt=""></p>
+<p>下面是配置gitlab的访问权限，其中的private key是Jenkins服务器的。<br><img src="/2019/07/06/jenkins-settings/jenkins-2.png" alt=""></p>
+<p>下面还要在gitlab中配置Jenkins服务器的public key。<br><img src="/2019/07/06/jenkins-settings/jenkins-3.png" alt=""></p>
 <h2 id="2，配置Build"><a href="#2，配置Build" class="headerlink" title="2，配置Build"></a>2，配置Build</h2><p>这一步用于编译并构建代码，构建方式取决于构建工具。<br><img src="/2019/07/06/jenkins-settings/jenkins-2-1.png" alt=""></p>
 <h2 id="3，配置Post-build-Actions"><a href="#3，配置Post-build-Actions" class="headerlink" title="3，配置Post-build Actions"></a>3，配置Post-build Actions</h2><p>这一步用于运行构建后的应用；这里使用的是Publish Over SSH插件，该插件需要自己下载安装，它可以将构建后的文件发送到远程的应用服务器上，并且还能执行远程服务器上的脚本。<br>当然这一步也可以选择其他的插件，比如：SSH plugin，但是它只能执行远程服务器脚本。</p>
 <p>安装完插件后，首先需要在Configure System中配置以下信息；其中的ssh server可能会连接失败，那么需要在Jenkins服务器上执行一个命令：<code>ssh-copy-id danny@192.168.152.128</code>。<br><img src="/2019/07/06/jenkins-settings/jenkins-3-1.png" alt=""></p>
