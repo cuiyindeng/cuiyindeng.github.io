@@ -16,10 +16,10 @@ tags:
 ![](jenkins-settings/jenkins-1.png)
 
 下面是配置gitlab的访问权限，其中的private key是Jenkins服务器的。
-![](jenkins-settings/jenkins2.png)
+![](jenkins-settings/jenkins-2.png)
 
 下面还要在gitlab中配置Jenkins服务器的public key。
-![](jenkins-settings/jenkins3.png)
+![](jenkins-settings/jenkins-3.png)
 
 ## 2，配置Build 
 这一步用于编译并构建代码，构建方式取决于构建工具。
