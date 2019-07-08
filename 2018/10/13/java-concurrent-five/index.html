@@ -8,17 +8,19 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>java并发-线程池和Executor | 技术空间</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="线程池的实现原理：">
+  <meta name="description" content="线程池的实现原理：Excetor框架有两个关键类实现了ExecutorService接口：继承关系图如下：  虚线是implements，实线是extends。  1，ThreadPoolExecutor它是线程池的实现类，主要有下列四个参数构成：  corePoolSize：核心线程池的大小 maximumPoolSize：最大线程池的大小 BlockingQueue： 用来保存等待执行的任务">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java并发-线程池和Executor">
 <meta property="og:url" content="http://yoursite.com/2018/10/13/java-concurrent-five/index.html">
 <meta property="og:site_name" content="技术空间">
-<meta property="og:description" content="线程池的实现原理：">
+<meta property="og:description" content="线程池的实现原理：Excetor框架有两个关键类实现了ExecutorService接口：继承关系图如下：  虚线是implements，实线是extends。  1，ThreadPoolExecutor它是线程池的实现类，主要有下列四个参数构成：  corePoolSize：核心线程池的大小 maximumPoolSize：最大线程池的大小 BlockingQueue： 用来保存等待执行的任务">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-28T22:16:14.851Z">
+<meta property="og:image" content="http://yoursite.com/2018/10/13/java-concurrent-five/Executor-1.png">
+<meta property="og:updated_time" content="2019-07-08T16:50:59.751Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java并发-线程池和Executor">
-<meta name="twitter:description" content="线程池的实现原理：">
+<meta name="twitter:description" content="线程池的实现原理：Excetor框架有两个关键类实现了ExecutorService接口：继承关系图如下：  虚线是implements，实线是extends。  1，ThreadPoolExecutor它是线程池的实现类，主要有下列四个参数构成：  corePoolSize：核心线程池的大小 maximumPoolSize：最大线程池的大小 BlockingQueue： 用来保存等待执行的任务">
+<meta name="twitter:image" content="http://yoursite.com/2018/10/13/java-concurrent-five/Executor-1.png">
   
     <link rel="alternative" href="/atom.xml" title="技术空间" type="application/atom+xml">
   
@@ -157,7 +159,34 @@
     <div class="article-entry" itemprop="articleBody">
       
         <a id="more"></a>
-<h2 id="线程池的实现原理："><a href="#线程池的实现原理：" class="headerlink" title="线程池的实现原理："></a>线程池的实现原理：</h2>
+<h2 id="线程池的实现原理："><a href="#线程池的实现原理：" class="headerlink" title="线程池的实现原理："></a>线程池的实现原理：</h2><p>Excetor框架有两个关键类实现了ExecutorService接口：<br>继承关系图如下：<br><img src="/2018/10/13/java-concurrent-five/Executor-1.png" alt=""></p>
+<blockquote>
+<p>虚线是implements，实线是extends。</p>
+</blockquote>
+<h3 id="1，ThreadPoolExecutor"><a href="#1，ThreadPoolExecutor" class="headerlink" title="1，ThreadPoolExecutor"></a>1，ThreadPoolExecutor</h3><p>它是线程池的实现类，主要有下列四个参数构成：</p>
+<ol>
+<li>corePoolSize：核心线程池的大小</li>
+<li>maximumPoolSize：最大线程池的大小</li>
+<li><p>BlockingQueue： 用来保存等待执行的任务的阻塞队列，可以选择以下几个阻塞队列</p>
+<blockquote>
+<p>  ArrayBlockingQueue：是一个基于数组结构的有界阻塞队列，此队列按 FIFO（先进先出）原则对元素进行排序。<br>  LinkedBlockingQueue：一个基于链表结构的阻塞队列，此队列按FIFO （先进先出） 排序元素，吞吐量通常要高于ArrayBlockingQueue。静态工厂方法Executors.newFixedThreadPool()使用了这个队列。<br>  SynchronousQueue：一个不存储元素的阻塞队列。每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，吞吐量通常要高于LinkedBlockingQueue，静态工厂方法Executors.newCachedThreadPool使用了这个队列。<br>  PriorityBlockingQueue：一个具有优先级得无限阻塞队列。</p>
+</blockquote>
+</li>
+<li><p>RejectedExecutionHandler：当ThreadPoolExecutor已经关闭或ThreadPoolExecutor已经饱和时（达到最大线程池大小且工作队列已满），需要一种策略处理提交的新任务。它也是execute()方法将要调用的Handler</p>
+</li>
+</ol>
+<p>还有三个不常用的参数：</p>
+<ol>
+<li>keepAliveTime：线程池的工作线程空闲后，线程保持存活的时间。如果任务很多，且每个任务执行的时间很短，可以调大这个参数，提高线程利用率。</li>
+<li>TimeUnit：线程活动保持时间的单位。</li>
+<li>ThreadFactory：主要用来创建线程。</li>
+</ol>
+<p>ThreadPoolExecutor通常由工厂类Executors来创建，Executors可以创建三种ThreadPoolExecutor：</p>
+<h4 id="1，FixedThreadPool"><a href="#1，FixedThreadPool" class="headerlink" title="1，FixedThreadPool"></a>1，FixedThreadPool</h4><p>它是可重用的固定线程数的线程池。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newFixedThreadPool</span><span class="params">(<span class="keyword">int</span> nThreads)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">                                    <span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">                                    <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2，SingleThreadExecutor"><a href="#2，SingleThreadExecutor" class="headerlink" title="2，SingleThreadExecutor"></a>2，SingleThreadExecutor</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newSingleThreadExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FinalizableDelegatedExecutorService</span><br><span class="line">        (<span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">1</span>,</span><br><span class="line">                                <span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">                                <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3，CacheThreadPool"><a href="#3，CacheThreadPool" class="headerlink" title="3，CacheThreadPool"></a>3，CacheThreadPool</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newCachedThreadPool</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">0</span>, Integer.MAX_VALUE,</span><br><span class="line">                                    <span class="number">60L</span>, TimeUnit.SECONDS,</span><br><span class="line">                                    <span class="keyword">new</span> SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2，ScheduledThreadExecutor"><a href="#2，ScheduledThreadExecutor" class="headerlink" title="2，ScheduledThreadExecutor"></a>2，ScheduledThreadExecutor</h3>
       
 
       
