@@ -8,18 +8,18 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>java并发-线程池和Executor | 技术空间</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="线程池的实现原理：Excetor框架有两个关键类实现了ExecutorService接口：继承关系图如下：  虚线是implements，实线是extends。  1，ThreadPoolExecutor它是线程池的实现类，主要有下列四个参数构成：  corePoolSize：核心线程池的大小 maximumPoolSize：最大线程池的大小 BlockingQueue： 用来保存等待执行的任务">
+  <meta name="description" content="线程池的使用和实现原理：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java并发-线程池和Executor">
 <meta property="og:url" content="http://yoursite.com/2018/10/13/java-concurrent-five/index.html">
 <meta property="og:site_name" content="技术空间">
-<meta property="og:description" content="线程池的实现原理：Excetor框架有两个关键类实现了ExecutorService接口：继承关系图如下：  虚线是implements，实线是extends。  1，ThreadPoolExecutor它是线程池的实现类，主要有下列四个参数构成：  corePoolSize：核心线程池的大小 maximumPoolSize：最大线程池的大小 BlockingQueue： 用来保存等待执行的任务">
+<meta property="og:description" content="线程池的使用和实现原理：">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/10/13/java-concurrent-five/Executor-1.png">
-<meta property="og:updated_time" content="2019-07-08T16:50:59.751Z">
+<meta property="og:updated_time" content="2019-07-08T16:53:39.694Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java并发-线程池和Executor">
-<meta name="twitter:description" content="线程池的实现原理：Excetor框架有两个关键类实现了ExecutorService接口：继承关系图如下：  虚线是implements，实线是extends。  1，ThreadPoolExecutor它是线程池的实现类，主要有下列四个参数构成：  corePoolSize：核心线程池的大小 maximumPoolSize：最大线程池的大小 BlockingQueue： 用来保存等待执行的任务">
+<meta name="twitter:description" content="线程池的使用和实现原理：">
 <meta name="twitter:image" content="http://yoursite.com/2018/10/13/java-concurrent-five/Executor-1.png">
   
     <link rel="alternative" href="/atom.xml" title="技术空间" type="application/atom+xml">
@@ -158,8 +158,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <a id="more"></a>
-<h2 id="线程池的实现原理："><a href="#线程池的实现原理：" class="headerlink" title="线程池的实现原理："></a>线程池的实现原理：</h2><p>Excetor框架有两个关键类实现了ExecutorService接口：<br>继承关系图如下：<br><img src="/2018/10/13/java-concurrent-five/Executor-1.png" alt=""></p>
+        <h2 id="线程池的使用和实现原理："><a href="#线程池的使用和实现原理：" class="headerlink" title="线程池的使用和实现原理："></a>线程池的使用和实现原理：</h2><a id="more"></a>
+<p>Excetor框架有两个关键类实现了ExecutorService接口：<br>继承关系图如下：<br><img src="/2018/10/13/java-concurrent-five/Executor-1.png" alt=""></p>
 <blockquote>
 <p>虚线是implements，实线是extends。</p>
 </blockquote>
