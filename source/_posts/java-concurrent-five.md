@@ -34,7 +34,7 @@ Excetor框架有两个关键类实现了ExecutorService接口：
 ThreadPoolExecutor通常由工厂类Executors来创建，Executors可以创建三种ThreadPoolExecutor：
 
 #### 1，FixedThreadPool
-它是可重用的固定线程数的线程池。
+它可以创建可重用的固定线程数的线程池；适用于需要限制当前线程数的场景，适用与负载比较重的服务器。
 
 ```java
 public static ExecutorService newFixedThreadPool(int nThreads) {
@@ -45,6 +45,7 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 ```
 
 #### 2，SingleThreadExecutor
+它可以创建单个线程的线程池；适用于需要顺序执行各个任务的应用场景。
 
 ```java
 public static ExecutorService newSingleThreadExecutor() {
@@ -56,6 +57,7 @@ public static ExecutorService newSingleThreadExecutor() {
 ```
 
 #### 3，CacheThreadPool
+它可以创建大小无边界的线程池；适用于执行短期异步任务的应用，或者负载较轻的服务器。
 
 ```java
 public static ExecutorService newCachedThreadPool() {
@@ -65,4 +67,9 @@ public static ExecutorService newCachedThreadPool() {
 }
 ```
 
-### 2，ScheduledThreadExecutor
+### 2，ScheduledThreadPoolExecutor
+
+它继承自ThreadPoolExecutor，可以实现延时或者定期执行任务。通常也是由Executors创建，Executors可以创建两种ScheduledThreadPoolExecutor：
+1. ScheduledThreadPoolExecutor：包含多个线程。
+2. SingleThreadScheduledExecutor：只包含一个线程。
+
