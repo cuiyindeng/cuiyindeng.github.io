@@ -242,48 +242,54 @@ q=*:*&
 
 #### solr配置
 ```shell
+
+#!/bin/bash
+
 #配置该环境变量会让solr以cloud的方式运行
-export ZK_HOST=192.168.0.201:2181,192.168.0.202:2181,192.168.0.203:2181
+echo "export ZK_HOST=192.168.152.128:2181,192.168.152.129:2181,192.168.152.130:2181" >> /etc/profile
+
+source /etc/profile
 
 #下载solr到指定目录
-wget -q 'http://apache.mirrors.hoobly.com/lucene/solr/6.5.1/solr-6.5.1.tgz' -P /root/
+wget -q 'http://mirrors.tuna.tsinghua.edu.cn/apache/lucene/solr/7.7.2/solr-7.7.2.tgz' -P /root/
 
 #解压出来安装脚本
-tar xzf /root/solr-6.5.1.tgz, solr-6.5.1/bin/install_solr_service.sh '--strip-components=2'
+tar xzf /root/solr-7.7.2.tgz solr-7.7.2/bin/install_solr_service.sh '--strip-components=2'
 
 #安装solr，安装后会自动运行
-bash install_solr_service.sh /root/solr-6.5.1.tgz
+bash install_solr_service.sh /root/solr-7.7.2.tgz
 
 #停止solr
 service solr stop
 
 #改变solr运行目录所属用户
-chown -R "danny:danny" /opt/solr-6.5.1
-chown -R "danny:danny" /opt/solr
+chown -R "solr:solr" /opt/solr-7.7.2
+chown -R "solr:solr" /opt/solr
 
 #重启solr
 service solr start
 
-#切换到用户danny的环境下创建collection
-su -c "/opt/solr/bin/solr create_collection \	#运行solr命令
-							-c products \	#创建collection的名称
-							-d /opt/myapp/configuration/solr/products/conf/ \	#collection需要的配置文件的目录，主要是schema.xml和solrconfig.xml文件，该文件需要提前编写。
-							-shards 4 \	#指定当前collection的shard数量
-							-replicationFactor 1 \	#指定每个shard划分replica的数量
-							-n products-conf" \	#指定配置文件目录在zookeeper中的名称。
-												#默认-d参数下的所有配置文件会上传到zookeeper中，
-												#且以collection的名称（即-c的参数）作为配置文件目录在zookeeper中名称。
-							- danny	#切换到指定用户下执行
+#切换到用户solr的环境下创建collection（SolrCloud模式）或core（standalone）
+su -c "/opt/solr/bin/solr create -c restaurants -d /opt/solr-conf/restaurants/ -shards 4 -replicationFactor 2 -n restaurants-conf" - solr
 
-#显示的将一个collection与指定的配置文件目录进行绑定
-sh /opt/solr/server/scripts/cloud-scripts/zkcli.sh \
-										-zkhost 192.168.0.19 \
-										-cmd linkconfig \
-										-collection products \
-										-confname products-conf
+su -c "/opt/solr/bin/solr create \ #运行solr命令
+							-c ufo \ #创建collection的名称
+							-d /opt/solr-conf/ufo/ \ #collection需要的配置文件的目录，主要是schema.xml和solrconfig.xml文件，该文件需要提前编写。
+							-shards 4 \ #指定当前collection的shard数量
+							-replicationFactor 2 \ #指定每个shard划分replica的数量
+							-n ufo-conf" \ #指定配置文件目录在zookeeper中的名称，默认-d参数下的所有配置文件会上传到zookeeper中，且以collection的名称（即-c的参数）作为配置文件目录在zookeeper中名称。
+							- solr #切换到指定用户下执行
 
-#创建core
-curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=products&collection=products"
+#手动将一个collection与指定的配置文件目录进行绑定
+#sh /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost 192.168.152.128 -cmd linkconfig -collection restaurants -confname restaurants-conf
+#sh /opt/solr/server/scripts/cloud-scripts/zkcli.sh -zkhost 192.168.152.128 -cmd linkconfig  -collection ufo -confname ufo-conf
+
+#手动创建core
+#curl 'http://localhost:8983/solr/admin/cores?action=CREATE&name=restaurants&collection=restaurants'
+#curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=ufo&collection=ufo"
+
+#删除collection
+#su -c "/opt/solr/bin/solr delete -c ufo -deleteConfig true" - solr
 										
 ```
 
