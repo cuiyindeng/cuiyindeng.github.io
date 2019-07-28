@@ -232,7 +232,9 @@ q=*:*&
 ### 自定义函数：
 ![](solr-usage/custom-function.png)
 
-## 9，SolrCloud
+## 9，Solr的处理流程
+
+## 10，SolrCloud
 
 ### 搭建
 
