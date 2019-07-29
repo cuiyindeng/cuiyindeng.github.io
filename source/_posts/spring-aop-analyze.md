@@ -1,9 +1,12 @@
 ---
-title: spring-aop-analyze
+title: 分析spring aop的实现
 date: 2019-07-27 19:26:27
 tags:
 ---
 
+spring在启动的时候开始解析aop设置
+
+<!-- more -->
 
 》//开启Aspect后，注册AnnotationAwareAspectJAutoProxyCreator，他根据@Pointcut注解定义的切点来自动代理相匹配的bean。
 》`org.springframework.aop.config.AopConfigUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(org.springframework.beans.factory.support.BeanDefinitionRegistry, java.lang.Object)`
