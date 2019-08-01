@@ -234,6 +234,10 @@ q=*:*&
 
 ## 9，Solr的处理流程
 
+### 搜索流程
+solr接收到搜索请求后，会根据query type（/select等），找到对应的RequestHandler。如果搜索指定了query parser，则使用指定的query parser对搜索请求进行解析。如果没指定则使用Request Handler配置的query parser。
+然后是查询索引库的数据，如果有特殊的搜索参数，则会进行特殊的处理；比如fq、sort等。最后使用ResponseWriter将结果返回给用户。
+
 ## 10，SolrCloud
 
 ### 搭建
