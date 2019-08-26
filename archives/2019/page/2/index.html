@@ -6,19 +6,15 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>分析spring ioc的实现 | tech blog</title>
+  <title>Archives: 2019 | tech blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1：bean的生命周期">
-<meta property="og:type" content="article">
-<meta property="og:title" content="分析spring ioc的实现">
-<meta property="og:url" content="http://yoursite.com/2019/07/29/spring-ioc-analyze/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="tech blog">
+<meta property="og:url" content="http://yoursite.com/archives/2019/page/2/index.html">
 <meta property="og:site_name" content="tech blog">
-<meta property="og:description" content="1：bean的生命周期">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-29T03:40:53.690Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分析spring ioc的实现">
-<meta name="twitter:description" content="1：bean的生命周期">
+<meta name="twitter:title" content="tech blog">
   
     <link rel="alternative" href="/atom.xml" title="tech blog" type="application/atom+xml">
   
@@ -136,162 +132,53 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-spring-ioc-analyze" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      分析spring ioc的实现
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2019" class="archive-year">2019</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2019/01/02/mybatis-principle/" class="archive-article-date">
+  	<time datetime="2019-01-02T13:05:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-02</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2019/01/02/mybatis-principle/">mybatis架构中的一些概念</a>
     </h1>
   
 
-        
-        <a href="/2019/07/29/spring-ioc-analyze/" class="archive-article-date">
-  	<time datetime="2019-07-29T03:33:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1：bean的生命周期</p>
-<a id="more"></a>
-<p>2：IOC容器是如何解决循环依赖的</p>
-<p>3：spring的哪中循环依赖是不能不解决的？ 为啥不能解决？</p>
-<p>1）org.springframework.context.support.AbstractApplicationContext#getbean </p>
-<p>2）org.springframework.beans.factory.support.AbstractBeanfactorydogetbean</p>
-<pre><code>2.1）transformedbeanname解析我们的别名
+        <div class="article-info info-on-right">
+          
+          
 
-2.2）getsingleton首先尝试去我们的缓存池中去获取对象，（由于是第一次创建Bean所以缓存池中没有对象）
-
-2.3）若出现循环依赖，判断bean是不是单例的不是就抛出异常
-
-2.4）当前容器是否有父工厂有由父工厂加教
-
-2.5）合并我们的Bean定义
-
-2.6）检查我们当前的bean定义是不是抽象的？
-
-2.7）做dependson的依赖检查
-
-2.8）调用 getsingleton的方法
-
-    2.8.1）beforesingletoncreation标志当前的Bean正在被创建日
-</code></pre><p>3）createbean创建Bean的流程</p>
-<pre><code>resolvebeforeinstantiation aop过程中找切面（ aspectj）
-
-3.1）docreatebean：调用我们真正的创建bean的流程
-</code></pre><p>4）org. springframework beans. factory support. Abstractautowirecapablebeanfactory#docreatebean</p>
-<pre><code>4.1）createbeaninstance（）调用我们的构造器来进行创建对象（属性还没有被赋值，）（早期对象）
-
-4.2）提前暴露我们的早期对象..加入到我们的缓存中
-
-创建A----去给我们的A中的属性B赋值的过程，发现依赖B对象然后 getbean（ Instb）
-
-创建B的流程去给我们B中的属性赋值的时候，发现依赖A对象
-</code></pre><p>》//解析bean<br>》<code>org.springframework.context.support.AbstractApplicationContext#invokeBeanFactoryPostProcessors</code><br>    》》<code>org.springframework.context.support.PostProcessorRegistrationDelegate#invokeBeanFactoryPostProcessors(org.springframework.beans.factory.config.ConfigurableListableBeanFactory, java.util.List&lt;org.springframework.beans.factory.config.BeanFactoryPostProcessor&gt;)</code><br>        》》》<code>org.springframework.context.support.PostProcessorRegistrationDelegate#invokeBeanDefinitionRegistryPostProcessors</code><br>            》》》》<code>org.springframework.context.annotation.ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry</code><br>                》》》》》//找到Config类<br>                》》》》》<code>org.springframework.context.annotation.ConfigurationClassPostProcessor#processConfigBeanDefinitions</code><br>                    》》》》》》//解析Config类下的bean<br>                    》》》》》》<code>org.springframework.context.annotation.ConfigurationClassParser#parse(java.util.Set&lt;org.springframework.beans.factory.config.BeanDefinitionHolder&gt;)</code><br>                        》》》》》》》//生成Config类所在的package<br>                        》》》》》》》<code>org.springframework.context.annotation.ConfigurationClassParser#processConfigurationClass</code><br>                            》》》》》》》》//解析Config类所在的package<br>                            》》》》》》》》<code>org.springframework.context.annotation.ComponentScanAnnotationParser#parse</code><br>                                》》》》》》》》》//扫描package下的class<br>                                》》》》》》》》》<code>org.springframework.context.annotation.ClassPathBeanDefinitionScanner#doScan</code><br>                                    》》》》》》》》》》//找到package下spring托管的bean，并初始化bean定义<br>                                    》》》》》》》》》》<code>org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider#findCandidateComponents</code></p>
-<p>》//初始化bean<br>》<code>org.springframework.context.support.AbstractApplicationContext#finishBeanFactoryInitialization</code><br>    》》spring 容器初始化时调用“预实例化单例”方法<br>    》》<code>org.springframework.beans.factory.support.DefaultListableBeanFactory#preInstantiateSingletons</code><br>        》》》根据bean名称获取容器中的bean<br>        》》》<code>org.springframework.beans.factory.support.AbstractBeanFactory#getBean(java.lang.String)</code><br>            》》》》<code>org.springframework.beans.factory.support.AbstractBeanFactory#doGetBean</code></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2019/07/29/spring-ioc-analyze/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2019/08/08/spring-transaction-analyze/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          解析spring事务管理
-        
-      </div>
-    </a>
   
   
-    <a href="/2019/07/27/spring-aop-analyze/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">分析spring aop的实现</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-
-
-
-
-  
-    <div class="duoshuo"></div>
+    </div></section>
   
 
-
+    
+    <nav id="page-nav">
+      <a class="extend prev" rel="prev" href="/archives/2019/">&laquo; Prev</a><a class="page-number" href="/archives/2019/">1</a><span class="page-number current">2</span>
+    </nav>
+  
 
 
           </div>
@@ -318,8 +205,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
-		isArchive: false,
+		isPost: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

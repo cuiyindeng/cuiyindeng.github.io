@@ -19,7 +19,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/12/05/solr-usage/standard-query-parser.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/05/solr-usage/dismax-query-parser.png">
 <meta property="og:image" content="http://yoursite.com/2018/12/05/solr-usage/custom-function.png">
-<meta property="og:updated_time" content="2019-07-23T12:49:47.530Z">
+<meta property="og:updated_time" content="2019-08-01T02:46:46.464Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="solr的使用">
 <meta name="twitter:description" content="1，配置手动创建corecore的目录结构和相关配置文件的位置是特定的。solr启动时会扫描solr_home文件的带有core.properties文件的子目录。具体形式可以参考以下结构：">
@@ -225,7 +225,8 @@
 </ol>
 <h3 id="Function-Range-Query-Parser（简称frange）"><a href="#Function-Range-Query-Parser（简称frange）" class="headerlink" title="Function Range Query Parser（简称frange）"></a>Function Range Query Parser（简称frange）</h3><p>可以根据函数计算值的范围来过滤索引文档。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q=*:*&amp;</span><br><span class="line">	fq=&#123;!frange l=10 u=15&#125;product(basePrice,sum(1,$userSalseTax))&amp;	//l表示lower最小值，u表示upper最大值。</span><br><span class="line">	userSalseTax=0.07</span><br></pre></td></tr></table></figure></p>
 <h3 id="自定义函数："><a href="#自定义函数：" class="headerlink" title="自定义函数："></a>自定义函数：</h3><p><img src="/2018/12/05/solr-usage/custom-function.png" alt=""></p>
-<h2 id="9，Solr的处理流程"><a href="#9，Solr的处理流程" class="headerlink" title="9，Solr的处理流程"></a>9，Solr的处理流程</h2><h2 id="10，SolrCloud"><a href="#10，SolrCloud" class="headerlink" title="10，SolrCloud"></a>10，SolrCloud</h2><h3 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h3><h4 id="zookeeper搭建"><a href="#zookeeper搭建" class="headerlink" title="zookeeper搭建"></a>zookeeper搭建</h4><p>参考：</p>
+<h2 id="9，Solr的处理流程"><a href="#9，Solr的处理流程" class="headerlink" title="9，Solr的处理流程"></a>9，Solr的处理流程</h2><h3 id="搜索流程"><a href="#搜索流程" class="headerlink" title="搜索流程"></a>搜索流程</h3><p>solr接收到搜索请求后，会根据query type（/select等），找到对应的RequestHandler。如果搜索指定了query parser，则使用指定的query parser对搜索请求进行解析。如果没指定则使用Request Handler配置的query parser。<br>然后是查询索引库的数据，如果有特殊的搜索参数，则会进行特殊的处理；比如fq、sort等。最后使用ResponseWriter将结果返回给用户。</p>
+<h2 id="10，SolrCloud"><a href="#10，SolrCloud" class="headerlink" title="10，SolrCloud"></a>10，SolrCloud</h2><h3 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h3><h4 id="zookeeper搭建"><a href="#zookeeper搭建" class="headerlink" title="zookeeper搭建"></a>zookeeper搭建</h4><p>参考：</p>
 <blockquote>
 <p><a href="https://blog.csdn.net/Thinking_one/article/details/89280227" target="_blank" rel="noopener">https://blog.csdn.net/Thinking_one/article/details/89280227</a></p>
 </blockquote>
