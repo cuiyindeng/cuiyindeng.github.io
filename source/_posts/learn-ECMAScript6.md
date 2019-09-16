@@ -215,5 +215,63 @@ var name = "Bob", time = "today";
 模板中还能放表达式用于运算，以及引用对象属性。
 模板字符串中还能调用函数。
 */
+
+var x = 1;
+var y = 2;
+
+`${x} + ${y} = ${x + y}`
+//"1 + 2 = 3"
 ```
 
+## Module的语法
+Module可以将大的程序拆分成互相依赖的小文件，再用简单的方法将它们拼接起来。
+ES6的模块默认使用严格模式，不管有没有在头部加"use strict"。
+
+### export命令
+模块功能只要有两个命令构成：export和import；export命令用于声明模块的对外接口，import命令用于输入其他模块提供的功能。
+
+一个模块就是一个独立文件，文件内的变量，外部无法获取。如果外部想要读取模块内部的某个变量，模块必须使用export关键字输出该变量。
+
+```JavaScript
+//写法1
+//profile.js
+export var firstName = 'Michael';
+export var lastName = 'Jackson';
+export var year = 1983;
+
+//写法2
+//profile.js
+var firstName = 'Michael';
+var lastName = 'Jackson';
+var year = 1983;
+
+export {firstName, lastName, year};
+
+//写法3
+//profile.js
+var v1 = 'Michael';
+var v2 = 'Jackson';
+var v3 = 1983;
+
+export {v1 as firstName, v2 as lastName, v3 as year};
+
+//export还可以导出函数和类。
+
+```
+
+### import命令
+使用了export定义了模块的对外接口后，在其它文件中就可以使用import加载这个模块了。
+```JavaScript
+//写法1
+//main.js
+import {firstName, lastName, year} from './profile';
+
+function setName(element) {
+    element.textContent = firstName + ' ' + lastName;
+}
+
+//写法2
+//为导入的变量声明别名
+import {firstName as surnamae} from './profile';
+
+```
