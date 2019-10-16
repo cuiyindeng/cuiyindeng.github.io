@@ -274,4 +274,33 @@ function setName(element) {
 //为导入的变量声明别名
 import {firstName as surnamae} from './profile';
 
+/**
+import是静态执行，所以不能使用变量（let x）和表达式（x + 'a'），只有在运行时才能得到结果。
+*/
+
+```
+### export default命令
+使用import命令时必须知道要加载的变量名或函数名，否则无法加载。
+为了能不使用变量名就能加载变量和函数，可以使用export default为模块指定默认输出。
+一个模块只能有一个export default。
+本质上export default就是输出一个叫做default的变量或方法，系统允许我们为它取任意的名字。
+
+```JavaScript
+//export-default.js
+export default function() {
+    console.log('foo');
+}
+
+//import-default.js
+//加载该模块时，import命令可以为该匿名函数指定任意的名字，此时import后面不适用大括号。
+import customName from './export-default';
+customName();//foo
+```
+
+### export和import的复合写法
+```JavaScript
+export {foo, bar} from 'my_module';
+//等价于
+import {foo, bar} from 'my_module';
+export {foo, bar};
 ```
