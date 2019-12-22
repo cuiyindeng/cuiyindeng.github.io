@@ -8,14 +8,17 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>linux中ssh的使用 | tech blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="实现linux服务器的免密码登录">
+<meta property="og:type" content="article">
 <meta property="og:title" content="linux中ssh的使用">
 <meta property="og:url" content="http://yoursite.com/2018/11/23/linux-ssh-usage/index.html">
 <meta property="og:site_name" content="tech blog">
+<meta property="og:description" content="实现linux服务器的免密码登录">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-28T22:16:14.864Z">
+<meta property="og:updated_time" content="2019-12-22T09:39:14.252Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="linux中ssh的使用">
+<meta name="twitter:description" content="实现linux服务器的免密码登录">
   
     <link rel="alternative" href="/atom.xml" title="tech blog" type="application/atom+xml">
   
@@ -153,7 +156,16 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>实现linux服务器的免密码登录</p>
+<a id="more"></a>
+<p>A是客户端，B是要登录的服务端。</p>
+<p>A的操作</p>
+<ol>
+<li>用<code>ssh-keygen</code>生成A的秘钥对。</li>
+<li>用<code>ssh-copy-id [B的ip]</code>命令把A的公钥发送到B。</li>
+<li>A可以直接用<code>ssh 用户名@[B的ip]</code>登录</li>
+</ol>
+
       
 
       
