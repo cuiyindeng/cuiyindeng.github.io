@@ -90,3 +90,8 @@ public class GenericMethods {
     }
 }
 ```
+
+### 擦除
+
+1. 在泛型代码内部，无法获取泛型参数类型的任何信息。
+2.  ArrayList<Demo>.class 替换为new ArrayList<Demo>().getClass()。
