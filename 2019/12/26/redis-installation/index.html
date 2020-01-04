@@ -6,15 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2019 | tech blog</title>
+  <title>源码方式安装redis | tech blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="tech blog">
-<meta property="og:url" content="http://yoursite.com/archives/2019/page/2/index.html">
+  <meta name="description" content="在Ubuntu上用源码的方式安装redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="源码方式安装redis">
+<meta property="og:url" content="http://yoursite.com/2019/12/26/redis-installation/index.html">
 <meta property="og:site_name" content="tech blog">
+<meta property="og:description" content="在Ubuntu上用源码的方式安装redis">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-01-01T12:58:52.148Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="tech blog">
+<meta name="twitter:title" content="源码方式安装redis">
+<meta name="twitter:description" content="在Ubuntu上用源码的方式安装redis">
   
     <link rel="alternative" href="/atom.xml" title="tech blog" type="application/atom+xml">
   
@@ -132,215 +136,137 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-redis-installation" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      源码方式安装redis
+    </h1>
+  
+
+        
+        <a href="/2019/12/26/redis-installation/" class="archive-article-date">
+  	<time datetime="2019-12-26T07:23:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-26</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="在Ubuntu上用源码的方式安装redis"><a href="#在Ubuntu上用源码的方式安装redis" class="headerlink" title="在Ubuntu上用源码的方式安装redis"></a>在Ubuntu上用源码的方式安装redis</h3><a id="more"></a>
+<ol>
+<li><p>环境准备</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt update</span><br><span class="line">$ sudo apt upgrade</span><br><span class="line">$ sudo apt install build-essential</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下载源码包编译</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo wget http://download.redis.io/releases/redis-5.0.7.tar.gz</span><br><span class="line">$ sudo tar xzf redis-5.0.7.tar.gz</span><br><span class="line">$ sudo <span class="built_in">cd</span> redis-5.0.7</span><br><span class="line">$ sudo make MALLOC=libc <span class="comment">##解决错误：zmalloc.h:50:10: fatal error: jemalloc/jemalloc.h: No such file or directory</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>拷贝命令到指定目录，用于使用redis_init_script脚本安装并启动redis服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ sudo cp src/redis-server /usr/<span class="built_in">local</span>/bin/</span><br><span class="line">$ sudo cp src/redis-cli /usr/<span class="built_in">local</span>/bin/</span><br><span class="line">$ sudo mkdir /etc/redis</span><br><span class="line">$ sudo mkdir /var/redis</span><br><span class="line">$ sudo mkdir /var/redis/6379</span><br><span class="line">$ sudo cp utils/redis_init_script /etc/init.d/redis_6379</span><br><span class="line">$ sudo cp redis.conf /etc/redis/6379.conf</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改配置文件，将daemonize项改成yes，dir项改为/var/redis/6379，logfile项改为/var/redis/6379/log/redis.log</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo vi /etc/redis/6379.conf</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置redis系统服务和启动redis服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo update-rc.d redis_6379 defaults</span><br><span class="line">$ sudo /etc/init.d/redis_6379 start <span class="comment">##或者service redis_6379 start</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>登录redis服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli -h 10.12.9.18 -p 7000 -c -a 12345</span><br><span class="line"><span class="comment">##ip：10.12.4.45 集群中的一个点</span></span><br><span class="line"><span class="comment">##-c 以集群方式登陆。cluster</span></span><br><span class="line"><span class="comment">##-a 密码。authority</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/13/mathematical-application/" class="archive-article-date">
-  	<time datetime="2019-07-13T13:14:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-13</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/13/mathematical-application/">【转】一些数学问题</a>
-    </h1>
-  
+      
 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2019/12/26/redis-installation/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/06/jenkins-settings/" class="archive-article-date">
-  	<time datetime="2019-07-06T14:27:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-06</time>
-</a>
-        </div>
-    	 
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/06/jenkins-settings/">用jenkins配置一个Freestyle project</a>
-    </h1>
+  
+    <a href="/2019/12/10/advanced-mathmatics/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">数学复习</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+  
+    <div class="duoshuo"></div>
   
 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/06/29/java-core-transfer/" class="archive-article-date">
-  	<time datetime="2019-06-29T10:45:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-29</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/06/29/java-core-transfer/">【转】为什么Java中只有值传递</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/06/29/java-core-generic/" class="archive-article-date">
-  	<time datetime="2019-06-29T03:52:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-29</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/06/29/java-core-generic/">java中的泛型</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/06/07/java-core-hashmap/" class="archive-article-date">
-  	<time datetime="2019-06-07T02:26:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/06/07/java-core-hashmap/">java中HashMap源码分析</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/05/09/sql-join-query/" class="archive-article-date">
-  	<time datetime="2019-05-09T14:08:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-05-09</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/05/09/sql-join-query/">sql中的联结查询</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/02/mybatis-principle/" class="archive-article-date">
-  	<time datetime="2019-01-02T13:05:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/02/mybatis-principle/">mybatis架构中的一些概念</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2019/">&laquo; Prev</a><a class="page-number" href="/archives/2019/">1</a><span class="page-number current">2</span>
-    </nav>
-  
 
 
           </div>
@@ -367,8 +293,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
