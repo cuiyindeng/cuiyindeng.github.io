@@ -30,3 +30,18 @@ tags:
 达利欧分析了原因：
 1. 资金从借债国回流到美国，使美元升值，给美国经济造成了通缩压力，从而可以使美联储可以在不加剧通胀的情况下降息。
 2. 美联储借给了银行现金，同时国际金融组织重新做出了安排，使债务国能够以举借新债的方式履行还款义务，这相当于所有人都认为一切都是良好的，然后在接下来的许多年里逐渐的减少不良债务。
+
+#### 坦诚相待
+![](principle-notes/principle-2.png)
+
+#### 塑造者
+![](principle-notes/principle-3.png)
+
+#### 认识现实
+![](principle-notes/principle-4.png)
+
+#### 5步流程实现人生愿望
+![](principle-notes/principle-5.png)
+
+#### 人与人大不相同
+![](principle-notes/principle-6.png)
