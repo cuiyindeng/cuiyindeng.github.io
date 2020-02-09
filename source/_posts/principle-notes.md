@@ -45,3 +45,4 @@ tags:
 
 #### 人与人大不相同
 ![](principle-notes/principle-6.png)
+![](principle-notes/principle-7.png)
