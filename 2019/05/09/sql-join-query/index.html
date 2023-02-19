@@ -22,7 +22,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/05/09/sql-join-query/sql-join-equal.png">
 <meta property="og:image" content="http://yoursite.com/2019/05/09/sql-join-query/sql-join-inner.png">
 <meta property="og:image" content="http://yoursite.com/2019/05/09/sql-join-query/sql-join-self.png">
-<meta property="og:updated_time" content="2022-07-30T08:42:36.808Z">
+<meta property="og:updated_time" content="2023-02-19T14:15:02.892Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="sql中的联结查询">
 <meta name="twitter:description" content="联结查询是关系型数据库中对多个关系表进行操作的重要功能。联结的方式可以分为以下几种。">
@@ -179,7 +179,7 @@
 <li>order_items表</li>
 </ol>
 <p><img src="/2019/05/09/sql-join-query/sql-items.png" alt></p>
-<h4 id="默认的联结查询"><a href="#默认的联结查询" class="headerlink" title="默认的联结查询"></a>默认的联结查询</h4><p><img src="/2019/05/09/sql-join-query/sql-join-no-condition.png" alt></p>
+<h4 id="默认的联结查询（包括各种联结）"><a href="#默认的联结查询（包括各种联结）" class="headerlink" title="默认的联结查询（包括各种联结）"></a>默认的联结查询（包括各种联结）</h4><p><img src="/2019/05/09/sql-join-query/sql-join-no-condition.png" alt></p>
 <p>第一个表中的每一行将与第二个表中的每一行配对。<br>这时返回的结果集被称为<code>笛卡尔积</code>；即检索出的行数等于第一个表中的行数乘以第二个表中的行数；也称为<code>叉联结（cross join）</code>。</p>
 <h4 id="等值联结"><a href="#等值联结" class="headerlink" title="等值联结"></a>等值联结</h4><p><img src="/2019/05/09/sql-join-query/sql-join-equal.png" alt></p>
 <p>通常情况下，联结查询都需要联结条件-<code>where语句</code>；这样才能过滤出正确的两个关系表中的数据。</p>
@@ -188,7 +188,7 @@
 <p><em>如果从表中有主表的重复的关联值，则查询主表时，会重复出现主表中的数据</em><br><em>例如查询uses时，由于orders中有重复的users的ID，所以查询时会有重复的users的数据</em></p>
 <h4 id="自联结"><a href="#自联结" class="headerlink" title="自联结"></a>自联结</h4><p><img src="/2019/05/09/sql-join-query/sql-join-self.png" alt></p>
 <p>用于同一个表的联结查询，需要用到表的别名。<br>上面语句的意思是找到订单额是2的用户的所有订单；SQL的执行顺序是from语句组成笛卡尔积，where语句从左到右过滤出需要的数据。</p>
-<h4 id="自然联结"><a href="#自然联结" class="headerlink" title="自然联结"></a>自然联结</h4><h4 id="外联结"><a href="#外联结" class="headerlink" title="外联结"></a>外联结</h4><p>用于查询在相关表中没有关联行的行。</p>
+<h4 id="自然联结"><a href="#自然联结" class="headerlink" title="自然联结"></a>自然联结</h4><h4 id="外联结"><a href="#外联结" class="headerlink" title="外联结"></a>外联结</h4><p>用于查询在相关表中没有关联行的行。<br>通常情况下，联结查询都需要联结条件-<code>on语句</code>；这样才能过滤出正确的两个关系表中的数据。</p>
 <h4 id="全外联结"><a href="#全外联结" class="headerlink" title="全外联结"></a>全外联结</h4><p>MySQL不支持</p>
 
       
@@ -299,7 +299,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2022 崔银登
+    		&copy; 2023 崔银登
     	</div>
 		<span id="busuanzi_container_site_uv">
 			本站访客数<span id="busuanzi_value_site_uv"></span>人次
