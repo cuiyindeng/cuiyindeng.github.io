@@ -16,7 +16,7 @@
 <meta property="og:description" content="java并发编程基础1. 线程简介线程都拥有各自的计数器、堆栈和局部变量等属性，并且能够访问共享的内存变量。">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/09/13/java-concurrent-two/thread-status.png">
-<meta property="og:updated_time" content="2022-07-30T08:42:36.761Z">
+<meta property="og:updated_time" content="2023-11-05T15:03:26.465Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java并发-并发编程基础">
 <meta name="twitter:description" content="java并发编程基础1. 线程简介线程都拥有各自的计数器、堆栈和局部变量等属性，并且能够访问共享的内存变量。">
@@ -165,6 +165,9 @@
 <li>中断好比其他线程对该线程打了个招呼，其他线程通过调用该线程的interrupt()<br>方法对其进行中断操作（设置了<code>中断标识位</code>）。</li>
 <li>许多声明抛出InterruptedException的方法（例如Thread.sleep(long millis)方法）这些方法在抛出InterruptedException之前，<br>JVM会先将该线程的<code>中断标识位</code>清除，然后抛出InterruptedException，此时调用线程对象的isInterrupted()方法依旧会返回false。</li>
 </ol>
+<blockquote>
+<p>如何安全地中断运行中的线程<br>虽然java里面提供了一个stop()方法，可以强行终止线程，但是这个方式是不安全的，造成在运行的线程产生不正确的结果。<br>想要安全的中断线程，只能在线程内部埋下一个钩子，线程外部通过这个钩子触发线程的中断命令。<br>java提供的一个interrupt()方法，这个方法要配合isInterrupted()方法来使用。</p>
+</blockquote>
 <h3 id="3-线程间通信"><a href="#3-线程间通信" class="headerlink" title="3. 线程间通信"></a>3. 线程间通信</h3><h4 id="emsp-emsp-等待通知范式"><a href="#emsp-emsp-等待通知范式" class="headerlink" title="&emsp;&emsp;等待通知范式"></a>&emsp;&emsp;等待通知范式</h4><ul>
 <li>等待方遵循的原则：</li>
 </ul>
