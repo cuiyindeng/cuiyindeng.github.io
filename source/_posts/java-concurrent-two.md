@@ -33,6 +33,10 @@ TERMINATED：终止状态，表示线程已经执行完毕。
 2. 许多声明抛出InterruptedException的方法（例如Thread.sleep(long millis)方法）这些方法在抛出InterruptedException之前，
 JVM会先将该线程的`中断标识位`清除，然后抛出InterruptedException，此时调用线程对象的isInterrupted()方法依旧会返回false。
 
+> 如何安全地中断运行中的线程
+> 虽然java里面提供了一个stop()方法，可以强行终止线程，但是这个方式是不安全的，造成在运行的线程产生不正确的结果。
+> 想要安全的中断线程，只能在线程内部埋下一个钩子，线程外部通过这个钩子触发线程的中断命令。
+> java提供的一个interrupt()方法，这个方法要配合isInterrupted()方法来使用。
 
 ### 3. 线程间通信
 
