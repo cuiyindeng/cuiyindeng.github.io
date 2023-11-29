@@ -6,18 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>java并发-java内存模型 | tech blog</title>
+  <title>java并发-java内存模型、底层实现原理 | tech blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="java内存模型1. 内存模型JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存中，每一个线程都有一个私有的本地内存，本地内存存储了该线程用来读/写共享变量的副本。JMM通过控制主内存与每个线程的本地内存之间的交互，来为java程序提供内存可见性的保证。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="java并发-java内存模型">
+<meta property="og:title" content="java并发-java内存模型、底层实现原理">
 <meta property="og:url" content="http://yoursite.com/2018/09/03/java-concurrent-one/index.html">
 <meta property="og:site_name" content="tech blog">
 <meta property="og:description" content="java内存模型1. 内存模型JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存中，每一个线程都有一个私有的本地内存，本地内存存储了该线程用来读/写共享变量的副本。JMM通过控制主内存与每个线程的本地内存之间的交互，来为java程序提供内存可见性的保证。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2023-10-15T05:38:03.422Z">
+<meta property="og:updated_time" content="2023-11-29T14:46:58.259Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="java并发-java内存模型">
+<meta name="twitter:title" content="java并发-java内存模型、底层实现原理">
 <meta name="twitter:description" content="java内存模型1. 内存模型JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存中，每一个线程都有一个私有的本地内存，本地内存存储了该线程用来读/写共享变量的副本。JMM通过控制主内存与每个线程的本地内存之间的交互，来为java程序提供内存可见性的保证。">
   
     <link rel="alternative" href="/atom.xml" title="tech blog" type="application/atom+xml">
@@ -143,7 +143,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      java并发-java内存模型
+      java并发-java内存模型、底层实现原理
     </h1>
   
 
@@ -203,6 +203,24 @@
 <li>有序性</li>
 </ol>
 <p>由于指令重排序的问题，代码的执行顺序未必是代码编写时的顺序。<br>volatile 关键字可以禁止指令进行重排序优化</p>
+<h2 id="并发底层实现原理"><a href="#并发底层实现原理" class="headerlink" title="并发底层实现原理"></a>并发底层实现原理</h2><h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><h4 id="emsp-emsp-对象头："><a href="#emsp-emsp-对象头：" class="headerlink" title="&emsp;&emsp;对象头："></a>&emsp;&emsp;对象头：</h4><ol>
+<li><p>Mark Word：主要存储对象的hashCode、分代年龄、锁标志位</p>
+</li>
+<li><p>类的元数据指针</p>
+</li>
+<li><p>数组长度</p>
+</li>
+</ol>
+<h4 id="emsp-emsp-锁的升级："><a href="#emsp-emsp-锁的升级：" class="headerlink" title="&emsp;&emsp;锁的升级："></a>&emsp;&emsp;锁的升级：</h4><ol>
+<li><p>无锁：标志位是<code>001</code>。</p>
+</li>
+<li><p>偏向锁：标志位是<code>101</code>；存在于的情况是：锁不存在多线程竞争，并且锁总是由同一个线程多次获取。<br>偏向锁撤销存在于的情况是：调用了锁对象的hashCode()（升级成重量级锁）、wait(timeout)（升级成重量级锁）、notify()（升级成轻量级锁）方法。</p>
+</li>
+<li><p>轻量级锁：标志位是<code>00</code>；存在于的情况是：两个线程交替执行同步代码块。</p>
+</li>
+<li><p>重量级锁：标志位是<code>10</code>;存在于的情况是：多个线程同时获取锁。</p>
+</li>
+</ol>
 
       
 
